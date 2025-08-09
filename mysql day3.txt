@@ -1,0 +1,258 @@
+Employee table -any all
+CREATE TABLE Employees (
+emp_id INT,
+name VARCHAR(50),
+salary INT,
+department VARCHAR(50)
+);
+
+INSERT INTO Employees (emp_id, name, salary, department) VALUES
+(1, &#39;Alice&#39;, 50000, &#39;HR&#39;),
+(2, &#39;Bob&#39;, 60000, &#39;IT&#39;),
+(3, &#39;Charlie&#39;, 70000, &#39;HR&#39;),
+(4, &#39;David&#39;, 55000, &#39;IT&#39;),
+(5, &#39;Eve&#39;, 65000, &#39;Sales&#39;),
+(6, &#39;Frank&#39;, 52000, &#39;Finance&#39;),
+(7, &#39;Grace&#39;, 48000, &#39;HR&#39;),
+(8, &#39;Hannah&#39;, 75000, &#39;IT&#39;),
+(9, &#39;Ian&#39;, 50000, &#39;Sales&#39;),
+(10, &#39;Jack&#39;, 58000, &#39;Finance&#39;);
+
+
+
+Section 1: Using ANY
+1. Get employees whose salary is greater than ANY employee in the HR department.
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| alice   |  50000 | HR         |
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| hannah  |  75000 | it         |
+| ian     |  50000 | sales      |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+9 rows in set (0.01 sec)
+2. Get employees whose salary is less than ANY employee in the IT department.
+select name,salary, department from employees where salary< any(select salary from employees where department='it');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| alice   |  50000 | HR         |
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| grace   |  48000 | hr         |
+| ian     |  50000 | sales      |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+9 rows in set (0.00 sec)
+3. Find employees whose salary is equal to ANY salary in the Finance department.
+mysql> select name,salary, department from employees where salary= any(select salary from employees where department='finance');
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| frank |  52000 | finance    |
+| jack  |  58000 | finance    |
++-------+--------+------------+
+2 rows in set (0.00 sec)
+4. Find employees whose salary is greater than ANY salary in the Sales department.
+mysql> select name,salary, department from employees where salary> any(select salary from employees where department='sales');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| hannah  |  75000 | it         |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+7 rows in set (0.00 sec)
+5. Find employees whose salary is less than ANY employee in the Finance department.
+mysql> select name,salary, department from employees where salary< any(select salary from employees where department='finance');
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| alice |  50000 | HR         |
+| david |  55000 | it         |
+| frank |  52000 | finance    |
+| grace |  48000 | hr         |
+| ian   |  50000 | sales      |
++-------+--------+------------+
+5 rows in set (0.00 sec)
+6. Find employees whose salary is not equal to ANY salary in the HR department.
+mysql> select name,salary, department from employees where salary<> any(select salary from employees where department='hr');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| alice   |  50000 | HR         |
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| grace   |  48000 | hr         |
+| hannah  |  75000 | it         |
+| ian     |  50000 | sales      |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+10 rows in set (0.00 sec)
+7. Select employees from IT who earn more than ANY HR employee.
+mysql> select name,salary, department from employees where department='it' and salary> any(select salary from employees where department='hr');
++--------+--------+------------+
+| name   | salary | department |
++--------+--------+------------+
+| bob    |  60000 | it         |
+| david  |  55000 | it         |
+| hannah |  75000 | it         |
++--------+--------+------------+
+3 rows in set (0.00 sec)
+8. Select employees from Sales who earn less than ANY IT employee.
+mysql> select name,salary, department from employees where department='sales' and salary< any(select salary from employees where department='it');
++------+--------+------------+
+| name | salary | department |
++------+--------+------------+
+| eve  |  65000 | sales      |
+| ian  |  50000 | sales      |
++------+--------+------------+
+2 rows in set (0.00 sec)
+9. List employees whose salary is higher than ANY employee in a different department.
+mysql> select name,salary, department from employees where salary> any(select salary from employees);
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| alice   |  50000 | HR         |
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| hannah  |  75000 | it         |
+| ian     |  50000 | sales      |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+9 rows in set (0.00 sec)
+10. Find employees whose salary is greater than ANY employee named &#39;Grace&#39;
+mysql> select name,salary, department from employees where salary> any(select salary from employees where name='grace');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| alice   |  50000 | HR         |
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| david   |  55000 | it         |
+| eve     |  65000 | sales      |
+| frank   |  52000 | finance    |
+| hannah  |  75000 | it         |
+| ian     |  50000 | sales      |
+| jack    |  58000 | finance    |
++---------+--------+------------+
+9 rows in set (0.00 sec)
+
+
+
+Section 2: Using ALL
+11. Get employees whose salary is greater than ALL employees in the HR department.
+mysql> select name,salary, department from employees where salary> all(select salary from employees where department='hr');
++--------+--------+------------+
+| name   | salary | department |
++--------+--------+------------+
+| hannah |  75000 | it         |
++--------+--------+------------+
+1 row in set (0.00 sec)
+
+12. Find employees whose salary is less than ALL employees in the IT department.
+mysql> select name,salary, department from employees where salary< all(select salary from employees where department='it');
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| alice |  50000 | HR         |
+| frank |  52000 | finance    |
+| grace |  48000 | hr         |
+| ian   |  50000 | sales      |
++-------+--------+------------+
+4 rows in set (0.00 sec)
+13. Find employees whose salary is equal to ALL employees in the Sales department.
+
+mysql> select name,salary, department from employees where salary= all(select salary from employees where department='sales');
+Empty set (0.00 sec)
+
+14. List employees who earn more than ALL employees in the Finance department.
+mysql> select name,salary, department from employees where salary> all(select salary from employees where department='finance');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| bob     |  60000 | it         |
+| charlie |  70000 | hr         |
+| eve     |  65000 | sales      |
+| hannah  |  75000 | it         |
++---------+--------+------------+
+4 rows in set (0.00 sec)
+15. Get employees whose salary is less than ALL employees in the Sales department.
+mysql> select name,salary, department from employees where salary< all(select salary from employees where department='sales');
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| grace |  48000 | hr         |
++-------+--------+------------+
+1 row in set (0.00 sec)
+16. Find employees whose salary is not equal to ALL employees in the HR department.
+mysql> select name,salary, department from employees where salary<> all(select salary from employees where department='hr');
++--------+--------+------------+
+| name   | salary | department |
++--------+--------+------------+
+| bob    |  60000 | it         |
+| david  |  55000 | it         |
+| eve    |  65000 | sales      |
+| frank  |  52000 | finance    |
+| hannah |  75000 | it         |
+| jack   |  58000 | finance    |
++--------+--------+------------+
+6 rows in set (0.01 sec)
+17. Find employees from HR who earn more than ALL employees in Sales.
+mysql> select name,salary, department from employees where department='hr' and salary> all(select salary from employees where department='sales');
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| charlie |  70000 | hr         |
++---------+--------+------------+
+1 row in set (0.00 sec)
+18. Find employees from Finance who earn less than ALL employees in IT.
+mysql> select name,salary, department from employees where department='finance' and salary< all(select salary from employees where department='it');
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| frank |  52000 | finance    |
++-------+--------+------------+
+1 row in set (0.00 sec)
+19. Select employees whose salary is higher than ALL employees whose salary is under 60000.
+mysql> select name,salary, department from employees where salary> all(select salary from employees where salary=60000);
++---------+--------+------------+
+| name    | salary | department |
++---------+--------+------------+
+| charlie |  70000 | hr         |
+| eve     |  65000 | sales      |
+| hannah  |  75000 | it         |
++---------+--------+------------+
+3 rows in set (0.00 sec)
+20. List employees whose salary is less than ALL employees earning above 60000.
+mysql> select name,salary, department from employees where salary< all(select salary from employees where salary=60000);
++-------+--------+------------+
+| name  | salary | department |
++-------+--------+------------+
+| alice |  50000 | HR         |
+| david |  55000 | it         |
+| frank |  52000 | finance    |
+| grace |  48000 | hr         |
+| ian   |  50000 | sales      |
+| jack  |  58000 | finance    |
++-------+--------+------------+
+6 rows in set (0.00 sec)
+
